@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
+# from django.views.decorators.cache import cache_page
 from django.urls import path
-from django.views.decorators.cache import cache_page
 
 from .views import *
 

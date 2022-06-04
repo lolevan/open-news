@@ -9,14 +9,23 @@ from .models import News, Category
 
 
 class NewsAdminForm(forms.ModelForm):
+    """
+    ckeditor work form
+    """
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
+        """
+        Form description
+        """
         model = News
         fields = '__all__'
 
 
 class NewsAdmin(admin.ModelAdmin):
+    """
+    This class is for the design of the admin panel
+    """
     form = NewsAdminForm
     list_display = ('id', 'title', 'created_at', 'updated_at', 'is_published', 'get_photo')
     list_display_links = ('id', 'title')
@@ -28,6 +37,11 @@ class NewsAdmin(admin.ModelAdmin):
     save_on_top = True
 
     def get_photo(self, obj):
+        """
+        this function is return the miniature
+        :param obj:
+        :return: miniature or str
+        """
         if obj.photo:
             return mark_safe(f'<img src="{obj.photo.url}" width="75">')
         else:
@@ -37,6 +51,9 @@ class NewsAdmin(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
+    """
+    This class is for the design of the admin panel
+    """
     list_display = ('id', 'title')
     list_display_links = ('id', 'title')
     search_fields = ('title',)

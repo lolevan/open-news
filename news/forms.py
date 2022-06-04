@@ -12,6 +12,9 @@ from re import match
 
 
 class ContactForm(forms.Form):
+    """
+    This form to contacts admins
+    """
     subject = forms.CharField(
         label='Тема',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -25,6 +28,9 @@ class ContactForm(forms.Form):
 
 
 class UserLoginForm(AuthenticationForm):
+    """
+    This is the user login form
+    """
     username = forms.CharField(
         label='Имя пользывателя',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -35,6 +41,9 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserRegisterForm(UserCreationForm):
+    """
+    This is the user registration form
+    """
     username = forms.CharField(
         label='Имя пользывателя',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -51,6 +60,9 @@ class UserRegisterForm(UserCreationForm):
     ))
 
     class Meta:
+        """
+        Form description
+        """
         model = User
         fields = ('username', 'email', 'password1', 'password2')
         # widgets = {
@@ -62,7 +74,13 @@ class UserRegisterForm(UserCreationForm):
 
 
 class NewsForm(forms.ModelForm):
+    """
+    Is a form for a creating news objects
+    """
     class Meta:
+        """
+        Form description
+        """
         model = News
         # fields = '__all__'
         fields = ['title', 'content', 'is_published', 'category']
