@@ -17,9 +17,9 @@
             <div class="card-body">
                 <div class="media">
                     {% if item.photo %}
-                        <img src="{{ item.photo.url }}" alt="" width="350" class="mr-3">
+                        <img src="{{ item.photo.url }}" style="border-radius: 10px;" alt="" width="350" class="mr-3">
                     {% else %}
-                        <img src="https://i.picsum.photos/id/1060/536/354.jpg?blur=2&hmac=0zJLs1ar00sBbW5Ahd_4zA6pgZqCVavwuHToO6VtcYY" alt="" width="350">
+                        <img src="https://i.picsum.photos/id/1060/536/354.jpg?blur=2&hmac=0zJLs1ar00sBbW5Ahd_4zA6pgZqCVavwuHToO6VtcYY" style="border-radius: 10px;" alt="" width="350">
                     {% endif %}
                     <div class="media-body">
                         <h5 class="card-title">{{ item.title }}</h5>
