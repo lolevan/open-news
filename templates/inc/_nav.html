@@ -15,7 +15,7 @@
         </ul>
         <span class="navbar-text position-absolute text-opacity-25 end-0">
         {% if request.user.is_authenticated %}
-            Добро пожаловать, {{ user.username }} | <a style="padding-right: 20px;" href="{% url 'logout' %}">Выход</a>
+            Добро пожаловать, <a href="{% url 'profile' %}">{{ user.username }}</a> | <a style="padding-right: 20px;" href="{% url 'logout' %}">Выход</a>
         {% else %}
             <a href="{% url 'register' %}">Register</a> | <a style="padding-right: 20px;" href="{% url 'login' %}">Login</a>
         {% endif %}

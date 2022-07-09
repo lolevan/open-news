@@ -7,7 +7,9 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
+
+from testsite.settings import EMAIL_HOST_USER
 
 from .models import News, Category
 
@@ -78,6 +80,20 @@ class CreateNews(LoginRequiredMixin, CreateView):
     raise_exception = True
 
 
+class ViewProfile(LoginRequiredMixin, ListView):
+    model = News
+    context_object_name = 'profile_items'
+    template_name = 'news/profile.html'
+    raise_exception = True
+
+    # def get_context_data(self, *, object_list=None, **kwargs):
+    #     context = super(ViewProfile, self).get_context_data(**kwargs)
+
+    #
+    # def get_queryset(self):
+    #     return News.objects.filter()
+
+
 def contact(request):
     """
     This function allows you to make a newsletter
@@ -87,14 +103,26 @@ def contact(request):
         if form.is_valid():
             mail = send_mail(
                 form.cleaned_data['subject'],
-                form.cleaned_data['content'],
-                'tosha-mitrokhin@mail.ru',
+                f"{form.cleaned_data['content']} "
+                f"\nС уважением {form.cleaned_data['email']}",
+                EMAIL_HOST_USER,
                 ['vanechka-nikitin-2004@mail.ru'],
                 fail_silently=True,
             )
+            user_mail = send_mail(
+                'Благодарственное письмо',
+                'Ваш запрос отправлен, благодарим за обратную связь.',
+                EMAIL_HOST_USER,
+                [form.cleaned_data['email']],
+                fail_silently=True,
+            )
+
             if mail:
-                messages.success(request, 'Письмо отправлено')
-                return redirect('contact')
+                if user_mail:
+                    messages.success(request, 'Письмо отправлено')
+                    return redirect('contact')
+                else:
+                    messages.error(request, 'Недействительная почта')
             else:
                 messages.error(request, 'Ошибка отправки')
         else:

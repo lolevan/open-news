@@ -148,8 +148,8 @@ INTERNAL_IPS = ['127.0.0.1']
 
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'tosha-mitrokhin@mail.ru'
-EMAIL_HOST_PASSWORD = 'X01dHEpsc6mF4m9MsAFu'
+EMAIL_HOST_USER = 'yegor.litvin.00@mail.ru'
+EMAIL_HOST_PASSWORD = 'Ag3Eh8ftSUOKe19UJyvY'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
