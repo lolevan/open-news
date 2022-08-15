@@ -1,6 +1,22 @@
 # -*- coding: UTF-8 -*-
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
+
+
+# class CustomUser(User):
+#     name = User.get_username()
+#     print(name)
+#     user = models.OneToOneField(to=name, on_delete=models.CASCADE, db_index=True, null=True, verbose_name='Никнейм')
+#     print(user)
+#     profile_img = models.ImageField(upload_to='photos/profile', null=True, verbose_name='Аватарка')
+#
+#     class Meta:
+#         verbose_name = 'Профиль'
+#         verbose_name_plural = 'Профили'
+#
+#     def __str__(self):
+#         return str(self.user)
 
 
 class News(models.Model):
@@ -12,7 +28,7 @@ class News(models.Model):
     is_published = models.BooleanField(default=True, verbose_name='Опубликованно')
     category = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name='Категория')
     views = models.IntegerField(default=0, verbose_name='Просмотры')
-    # author = models.ForeignKey()
+    author = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='автор', null=True)
 
     class Meta:
         verbose_name = 'Новость'

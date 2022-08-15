@@ -69,7 +69,7 @@ class ViewNews(DetailView):
     # template_name = 'news/news_detail.html'
 
 
-class CreateNews(LoginRequiredMixin, CreateView):
+class CreateNews(CreateView, LoginRequiredMixin):
     """
     This class Create Object in the interface
     """
@@ -79,19 +79,23 @@ class CreateNews(LoginRequiredMixin, CreateView):
     # success_url = reverse_lazy('home')
     raise_exception = True
 
+    def form_valid(self, form):
+        """
+        relation of the object to the author
+        """
+        form.instance.author = self.request.user
+        return super(CreateNews, self).form_valid(form)
 
-class ViewProfile(LoginRequiredMixin, ListView):
+
+class ViewProfile(ListView, LoginRequiredMixin):
     model = News
     context_object_name = 'profile_items'
     template_name = 'news/profile.html'
     raise_exception = True
+    paginate_by = 3
 
-    # def get_context_data(self, *, object_list=None, **kwargs):
-    #     context = super(ViewProfile, self).get_context_data(**kwargs)
-
-    #
-    # def get_queryset(self):
-    #     return News.objects.filter()
+    def get_queryset(self):
+        return News.objects.filter(author=self.request.user).select_related('category')
 
 
 def contact(request):

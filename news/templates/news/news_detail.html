@@ -24,7 +24,7 @@
 
             </div>
         <div class="card-footer text-muted">
-            {{ news_item.created_at|date:'Y-m-d H:i:s' }}
+            {{ news_item.created_at|date:'Y-m-d H:i' }} | {{ news_item.author }}
         </div>
     </div>
 {% endblock %}
