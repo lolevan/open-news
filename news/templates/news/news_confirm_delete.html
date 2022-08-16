@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Добавление новости :: {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+
+    <h1>Вы уверены что хотите удалить новость?</h1>
+    <div class="card mb-3">
+            <div class="card-header">
+                Категория: <a href="{{ object.category.get_absolute_url }}">{{ object.category }}</a>
+            </div>
+            <div class="card-body">
+                <div class="media">
+                    {% if object.photo %}
+                        <img src="{{ object.photo.url }}" style="border-radius: 10px;" alt="" width="350" class="mr-3">
+                    {% else %}
+                        <img src="https://i.picsum.photos/id/1060/536/354.jpg?blur=2&hmac=0zJLs1ar00sBbW5Ahd_4zA6pgZqCVavwuHToO6VtcYY" style="border-radius: 10px;" alt="" width="350">
+                    {% endif %}
+                    <div class="media-body">
+                        <h5 class="card-title">{{ object.title }}</h5>
+                        <p class="card-text">{{ object.content|safe|linebreaks|truncatewords:50 }}</p>
+                        <a href="{{ object.get_absolute_url }}" class="btn btn-primary">Read more...</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                {{ object.created_at|date:'Y-m-d H:i' }} | {{ object.author }}
+            </div>
+        </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-danger" style="width: 100%;margin: 5px auto;" value="Удалить новость">
+    </form>
+{% endblock %}

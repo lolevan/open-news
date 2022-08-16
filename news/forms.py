@@ -17,6 +17,9 @@ class ContactForm(forms.Form):
     """
     This form to contacts admins
     """
+    email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'rows': 5}
+    ))
     subject = forms.CharField(
         label='Тема',
         widget=forms.TextInput(attrs={'class': 'form-control'}),

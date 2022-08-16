@@ -71,7 +71,7 @@
                                                     <div class="media-body">
                                                         <h5 class="card-title">{{ post.title }}</h5>
                                                         <p class="card-text">{{ post.content|safe|linebreaks|truncatewords:50 }}</p>
-                                                        <a href="{{ post.get_absolute_url }}" class="btn btn-primary">Read more...</a>
+                                                        <a href="/profile/update-news/{{ post.id }}" class="btn btn-primary">Редактировать</a> <a class="btn btn-danger position-absolute end-0" href="delete-news/{{ post.id }}/" >Удалить новость</a>
                                                     </div>
                                                 </div>
                                             </div>

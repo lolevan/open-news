@@ -9,9 +9,12 @@
 {% endblock %}
 {% block content %}
 
-    <h1>Добавление новости</h1>
-
-    <form action="{% url 'add_news' %}" method="post" enctype="multipart/form-data">
+    <h1>{{ action }} новости</h1>
+    {% if action == 'Добавление' %}
+    <form action='{% url 'add_news' %}' method="post" enctype="multipart/form-data">
+    {% else %}
+        <form method="post" enctype="multipart/form-data">
+    {% endif %}
         {% csrf_token %}
 
         {{ form.media }}

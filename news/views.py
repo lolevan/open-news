@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 # get_object_or_404
-# from django.urls import reverse_lazy
+from django.urls import reverse_lazy
 # from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -78,6 +78,12 @@ class CreateNews(CreateView, LoginRequiredMixin):
     # login_url = '/admin/'
     # success_url = reverse_lazy('home')
     raise_exception = True
+    # fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateNews, self).get_context_data(**kwargs)
+        context['action'] = 'Добавление'
+        return context
 
     def form_valid(self, form):
         """
@@ -88,6 +94,9 @@ class CreateNews(CreateView, LoginRequiredMixin):
 
 
 class ViewProfile(ListView, LoginRequiredMixin):
+    """
+    Viewing a profile in posts
+    """
     model = News
     context_object_name = 'profile_items'
     template_name = 'news/profile.html'
@@ -96,6 +105,40 @@ class ViewProfile(ListView, LoginRequiredMixin):
 
     def get_queryset(self):
         return News.objects.filter(author=self.request.user).select_related('category')
+
+
+class UpdateNewsView(UpdateView):
+    """
+    Update posts
+    """
+    model = News
+    form_class = NewsForm
+    template_name = 'news/add_news.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateNewsView, self).get_context_data(**kwargs)
+        context['action'] = 'Обновление'
+        return context
+
+    def get_queryset(self):
+        """
+        Restricts access to posts
+        """
+        base_qs = super(UpdateNewsView, self).get_queryset()
+        return base_qs.filter(author=self.request.user)
+
+
+class DeleteNewsView(DeleteView):
+    model = News
+    template_name = 'news/news_confirm_delete.html'
+    success_url = reverse_lazy('profile')
+
+    def get_queryset(self):
+        """
+        Restricts access to posts
+        """
+        base_qs = super(DeleteNewsView, self).get_queryset()
+        return base_qs.filter(author=self.request.user)
 
 
 def contact(request):
@@ -175,6 +218,41 @@ def user_logout(request):
     """
     logout(request)
     return redirect('login')
+
+
+# class ContactView(FormView):
+#     form_class = ContactForm
+#     template_name = 'news/test.html'
+#
+#     success_url = reverse_lazy('contact')
+#
+#     def form_valid(self, form):
+#         mail = send_mail(
+#             form.cleaned_data['subject'],
+#             f"{form.cleaned_data['content']} "
+#             f"\nС уважением {form.cleaned_data['email']}",
+#             EMAIL_HOST_USER,
+#             ['vanechka-nikitin-2004@mail.ru'],
+#             fail_silently=True,
+#         )
+#         user_mail = send_mail(
+#             'Благодарственное письмо',
+#             'Ваш запрос отправлен, благодарим за обратную связь.',
+#             EMAIL_HOST_USER,
+#             [form.cleaned_data['email']],
+#             fail_silently=True,
+#         )
+#
+#         if mail:
+#             if user_mail:
+#                 messages.success(self.request, 'Письмо отправлено')
+#                 return redirect('contact')
+#             else:
+#                 messages.error(self.request, 'Недействительная почта')
+#         else:
+#             messages.error(self.request, 'Ошибка отправки')
+#         # ContactForm(request.POST)
+#         return super(ContactView, self).form_valid(form)
 
 
 # def index(request):

@@ -13,10 +13,13 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path('contact/', contact, name='contact'),
+    # path('contact/', ContactView.as_view(), name='contact'),
     # path('', cache_page(60)(HomeNews.as_view()), name='home'),
     path('', HomeNews.as_view(), name='home'),
     path('category/<int:category_id>/', NewsByCategory.as_view(), name='category'),
     path('news/<int:pk>/', ViewNews.as_view(), name='view_news'),
     path('news/add-news/', CreateNews.as_view(), name='add_news'),
     path('profile/', ViewProfile.as_view(), name='profile'),
+    path('profile/update-news/<int:pk>/', UpdateNewsView.as_view(), name='update_news'),
+    path('profile/delete-news/<int:pk>/', DeleteNewsView.as_view()),
 ]
