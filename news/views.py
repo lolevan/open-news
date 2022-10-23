@@ -129,6 +129,9 @@ class UpdateNewsView(UpdateView):
 
 
 class DeleteNewsView(DeleteView):
+    """
+    Deleting posts
+    """
     model = News
     template_name = 'news/news_confirm_delete.html'
     success_url = reverse_lazy('profile')

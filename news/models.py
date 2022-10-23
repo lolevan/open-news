@@ -4,21 +4,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 
-# class CustomUser(User):
-#     name = User.get_username()
-#     print(name)
-#     user = models.OneToOneField(to=name, on_delete=models.CASCADE, db_index=True, null=True, verbose_name='Никнейм')
-#     print(user)
-#     profile_img = models.ImageField(upload_to='photos/profile', null=True, verbose_name='Аватарка')
-#
-#     class Meta:
-#         verbose_name = 'Профиль'
-#         verbose_name_plural = 'Профили'
-#
-#     def __str__(self):
-#         return str(self.user)
-
-
 class News(models.Model):
     title = models.CharField(max_length=150, verbose_name='Наименование')
     content = models.TextField(blank=True, verbose_name='Контент')
