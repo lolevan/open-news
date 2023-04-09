@@ -46,6 +46,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Вставить переменные в .env.dev которые вам нужны:
+
+![image](https://user-images.githubusercontent.com/86129944/230759873-9162936f-4c07-4fb7-838b-86bab41616bc.png)
+
 Сделать и выполнить миграции:
 
 ```
