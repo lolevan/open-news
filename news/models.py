@@ -27,6 +27,24 @@ class News(models.Model):
         return reverse('view_news', kwargs={'pk': self.pk})
 
 
+class Comments(models.Model):
+    news = models.ForeignKey(News, on_delete=models.CASCADE, verbose_name='Новость')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    text = models.TextField(verbose_name='Текст')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies',
+                               verbose_name='Родительский коментарий')
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.text
+
+
 class Category(models.Model):
     title = models.CharField(max_length=150, db_index=True, verbose_name='Наименование категории')
 

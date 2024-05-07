@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.getenv('SECRET_KEY', default='da')
+SECRET_KEY = "dadadada"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -146,12 +146,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = ['127.0.0.1']
 
-EMAIL_HOST = os.environ.getenv('EMAIL_HOST', default='smtp.mail.ru')
-EMAIL_PORT = int(os.environ.getenv('EMAIL_PORT'))
-EMAIL_HOST_USER = os.environ.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = int(os.environ.getenv('EMAIL_USE_TLS', default=False))
-EMAIL_USE_SSL = int(os.environ.getenv('EMAIL_USE_SSL', default=True))
+
+EMAIL_HOST = 'EMAIL_HOST'
+EMAIL_PORT = 'EMAIL_PORT'
+EMAIL_HOST_USER = 'EMAIL_HOST_USER'
+EMAIL_HOST_PASSWORD = 'EMAIL_HOST_PASSWORD'
+EMAIL_USE_TLS = 'EMAIL_USE_TLS'
+EMAIL_USE_SSL = 'EMAIL_USE_SSL'
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
