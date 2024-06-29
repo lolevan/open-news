@@ -5,7 +5,7 @@ from django import forms
 
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
-from .models import News, Category
+from .models import News, Category, Comment, Rating
 
 
 class NewsAdminForm(forms.ModelForm):
@@ -66,8 +66,19 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('title',)
 
 
+class RatingAdmin(admin.ModelAdmin):
+    """
+    This class is for the design of the admin panel
+    """
+    list_display = ('id', 'user', 'news', 'value')
+    list_display_links = ('id', 'user', 'news')
+    search_fields = ('user', 'news')
+
+
 admin.site.register(News, NewsAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Comment)
+admin.site.register(Rating, RatingAdmin)
 
 admin.site.site_title = 'Управление новостями'
 admin.site.site_header = 'Управление новостями'

@@ -7,24 +7,110 @@
 {% block sidebar %}
     {% include 'inc/_sidebar.html' %}
 {% endblock %}
+
 {% block content %}
     <div class="card mb-3">
         <div class="card-header">
             Категория: <a href="{{ news_item.category.get_absolute_url }}">{{ news_item.category }}</a>
+            <p>Средняя оценка: {{ average_rating }}</p>
         </div>
         <div class="card-body">
-                {% if news_item.photo %}
-                    <img src="{{ news_item.photo.url }}" alt="" width="350" class="mr-3">
-                {% else %}
-                    <img src="https://i.picsum.photos/id/1060/536/354.jpg?blur=2&hmac=0zJLs1ar00sBbW5Ahd_4zA6pgZqCVavwuHToO6VtcYY" alt="" width="350">
-                {% endif %}
+            <div class="row">
 
+                    {% if news_item.photo %}
+                        <img src="{{ news_item.photo.url }}" alt="" class="img-fluid">
+                    {% else %}
+                        <img src="https://i.picsum.photos/id/1060/536/354.jpg?blur=2&hmac=0zJLs1ar00sBbW5Ahd_4zA6pgZqCVavwuHToO6VtcYY" alt="" class="img-fluid">
+                    {% endif %}
+
+                <div class="col-md-8">
                     <h5 class="card-title">{{ news_item.title }}</h5>
                     <p class="card-text">{{ news_item.content|safe|linebreaks }}</p>
-
+                </div>
             </div>
+        </div>
         <div class="card-footer text-muted">
             {{ news_item.created_at|date:'Y-m-d H:i:s' }}
         </div>
     </div>
+
+{% if user.is_authenticated %}
+    <!-- Форма рейтинга -->
+    <form method="post" action="{% url 'rate_news' news_id %}">
+        {% csrf_token %}
+        <select name="rating" class="form-select form-select-sm mb-3" aria-label=".form-select-lg example" style="width: 6%">
+            <option value="1" {% if initial_rating == 1 %}selected{% endif %}>1</option>
+            <option value="2" {% if initial_rating == 2 %}selected{% endif %}>2</option>
+            <option value="3" {% if initial_rating == 3 %}selected{% endif %}>3</option>
+            <option value="4" {% if initial_rating == 4 %}selected{% endif %}>4</option>
+            <option value="5" {% if initial_rating == 5 %}selected{% endif %}>5</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Оценить</button>
+    </form>
+
+    <!-- Форма комментариев -->
+    <div class="mt-4">
+        <h3>Добавить комментарий</h3>
+        <form method="post" action="{% url 'view_news' pk=news_item.pk %}">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+    </div>
+{% endif %}
+
+<div class="comments">
+    <h3>Комментарии</h3>
+    <ul class="list-unstyled">
+        {% for comment in news_item.comments.all %}
+            {% if comment.parent_id is None %}
+                <li>
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            От: {{ comment.author.username }}
+                        </div>
+                        <div class="card-body">
+                            {{ comment.text }}
+                        </div>
+                        <!-- Reply button -->
+                        {% if user.is_authenticated %}
+                            <div class="card-footer">
+                                <button class="btn btn-link reply-btn">Ответить</button>
+                            </div>
+                            <!-- Reply form (hidden by default) -->
+                            <div class="card-body reply-form" style="display: none;">
+                                <form method="post" action="{% url 'view_news' pk=news_item.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                    {{ comment_form.as_p }}
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                        <!-- Display replies -->
+                        {% for reply in comment.replies.all %}
+                            <div class="card mb-2 ml-5">
+                                <div class="card-header">
+                                    Ответ от: {{ reply.author.username }}
+                                </div>
+                                <div class="card-body bg-light">
+                                    {{ reply.text }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+    <script>
+        // JavaScript to toggle reply form visibility
+        document.querySelectorAll('.reply-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const replyForm = button.parentElement.nextElementSibling;
+                replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    </script>
 {% endblock %}

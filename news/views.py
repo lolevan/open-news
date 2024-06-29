@@ -1,19 +1,22 @@
 # -*- coding: UTF-8 -*-
 # get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 # from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.core.mail import send_mail, get_connection
+from django.contrib.auth.models import AnonymousUser
 
 from testsite.settings import EMAIL_HOST_USER
 
-from .models import News, Category
+from .models import News, Category, Rating, Comment
 
-from .forms import NewsForm, UserRegisterForm, UserLoginForm, ContactForm
+from .forms import NewsForm, UserRegisterForm, UserLoginForm, ContactForm, CommentForm
 
 from .utils import MyMixin
 
@@ -33,6 +36,11 @@ class HomeNews(MyMixin, ListView):
         context = super(HomeNews, self).get_context_data(**kwargs)
         context['title'] = self.get_upper('Главная страница')
         context['mixin_prop'] = self.get_prop()
+
+        # Добавляем среднюю оценку для каждого поста в контекст
+        for news_item in context['news']:
+            news_item.average_rating = news_item.average_rating()
+
         return context
 
     def get_queryset(self):
@@ -60,25 +68,81 @@ class NewsByCategory(MyMixin, ListView):
 
 
 class ViewNews(DetailView):
-    """
-    This class View object in the interface
-    """
     model = News
     context_object_name = 'news_item'
-    # pk_url_kwarg = 'news_id'
-    # template_name = 'news/news_detail.html'
+    template_name = 'news/view_news.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = CommentForm()  # Добавляем форму комментария в контекст
+
+        # Добавляем значение оценки пользователя, если она существует
+        news_item = self.get_object()
+
+        if self.request.user.is_authenticated:
+            user_rating = Rating.objects.filter(user=self.request.user, news=news_item).first()
+            initial_rating = user_rating.value if user_rating else None
+        else:
+            initial_rating = None
+
+        context['initial_rating'] = initial_rating
+
+        # Добавляем news_id в контекст, чтобы он был доступен в шаблоне
+        context['news_id'] = news_item.pk
+
+        # Добавляем среднюю оценку в контекст
+        context['average_rating'] = news_item.average_rating()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        news_item = self.get_object()
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.news = news_item
+            comment.author = request.user
+
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                comment.parent_id = parent_id
+
+            comment.save()
+            return redirect(news_item)
+
+        else:
+            context = self.get_context_data()
+            context['comment_form'] = form
+            return self.render_to_response(context)
 
 
-class CreateNews(CreateView, LoginRequiredMixin):
+@login_required
+def rate_news(request, news_id):
+    news = get_object_or_404(News, pk=news_id)
+    if request.user.is_authenticated:  # Проверяем, аутентифицирован ли пользователь
+        user_rating = Rating.objects.filter(user=request.user, news=news).first()
+        initial_rating = user_rating.value if user_rating else None
+
+        if request.method == 'POST':
+            rating_value = int(request.POST.get('rating'))
+            rating, created = Rating.objects.get_or_create(user=request.user, news=news)
+            rating.value = rating_value
+            rating.save()
+            return redirect('view_news', pk=news_id)
+
+        return render(request, 'view_news.html', {'news': news, 'initial_rating': initial_rating})
+    else:
+        return HttpResponseForbidden()
+
+
+class CreateNews(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
     This class Create Object in the interface
     """
     form_class = NewsForm
     template_name = 'news/add_news.html'
-    # login_url = '/admin/'
-    # success_url = reverse_lazy('home')
     raise_exception = True
-    # fields = '__all__'
+    success_url = reverse_lazy('home')
 
     def get_context_data(self, **kwargs):
         context = super(CreateNews, self).get_context_data(**kwargs)
@@ -92,19 +156,40 @@ class CreateNews(CreateView, LoginRequiredMixin):
         form.instance.author = self.request.user
         return super(CreateNews, self).form_valid(form)
 
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_staff
+
+    def handle_no_permission(self):
+        if self.raise_exception:
+            from django.core.exceptions import PermissionDenied
+            raise PermissionDenied
+        return redirect('login')  # или любая другая страница для перенаправления
+
 
 class ViewProfile(ListView, LoginRequiredMixin):
     """
     Viewing a profile in posts
     """
-    model = News
+    model = Comment
     context_object_name = 'profile_items'
     template_name = 'news/profile.html'
-    raise_exception = True
     paginate_by = 3
 
     def get_queryset(self):
-        return News.objects.filter(author=self.request.user).select_related('category')
+        # Получаем все комментарии пользователя
+        user_comments = Comment.objects.filter(author=self.request.user)
+
+        # Создаем список для хранения связанных с комментариями оценок
+        profile_items = []
+
+        # Для каждого комментария получаем связанный пост и оценку
+        for comment in user_comments:
+            post = comment.news
+            rating = Rating.objects.filter(user=self.request.user, news=post).first()
+            rating_value = rating.value if rating else None
+            profile_items.append({'post': post, 'comment': comment, 'rating_value': rating_value})
+
+        return profile_items
 
 
 class UpdateNewsView(UpdateView):
@@ -221,76 +306,3 @@ def user_logout(request):
     """
     logout(request)
     return redirect('login')
-
-
-# class ContactView(FormView):
-#     form_class = ContactForm
-#     template_name = 'news/test.html'
-#
-#     success_url = reverse_lazy('contact')
-#
-#     def form_valid(self, form):
-#         mail = send_mail(
-#             form.cleaned_data['subject'],
-#             f"{form.cleaned_data['content']} "
-#             f"\nС уважением {form.cleaned_data['email']}",
-#             EMAIL_HOST_USER,
-#             ['vanechka-nikitin-2004@mail.ru'],
-#             fail_silently=True,
-#         )
-#         user_mail = send_mail(
-#             'Благодарственное письмо',
-#             'Ваш запрос отправлен, благодарим за обратную связь.',
-#             EMAIL_HOST_USER,
-#             [form.cleaned_data['email']],
-#             fail_silently=True,
-#         )
-#
-#         if mail:
-#             if user_mail:
-#                 messages.success(self.request, 'Письмо отправлено')
-#                 return redirect('contact')
-#             else:
-#                 messages.error(self.request, 'Недействительная почта')
-#         else:
-#             messages.error(self.request, 'Ошибка отправки')
-#         # ContactForm(request.POST)
-#         return super(ContactView, self).form_valid(form)
-
-
-# def index(request):
-#     news = News.objects.all()
-#     context = {
-#         'news': news,
-#         'title': 'News list',
-#     }
-#     return render(request, 'news/index.html', context)
-
-
-# def get_category(request, category_id):
-#     news = News.objects.filter(category_id=category_id)
-#     category = Category.objects.get(pk=category_id)
-#     context = {
-#         'news': news,
-#         'category': category,
-#     }
-#     return render(request, 'news/category.html', context)
-
-
-# def view_news(request, news_id):
-#     # news_item = News.objects.get(pk=news_id)
-#     news_item = get_object_or_404(News, pk=news_id)
-#     return render(request, 'news/view_news.html', {'news_item': news_item})
-
-
-# def add_news(request):
-#     if request.method == 'POST':
-#         form = NewsForm(request.POST)
-#         if form.is_valid():
-#             # print(form.cleaned_data)
-#             # news = News.objects.create(**form.cleaned_data)
-#             news = form.save()
-#             return redirect(news)
-#     else:
-#         form = NewsForm()
-#     return render(request, 'news/add_news.html', {'form': form})

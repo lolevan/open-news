@@ -10,13 +10,14 @@
 
 {% block content %}
 
-    <h1>Login</h1>
+    <h1>Войти</h1>
 
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary" style="width: 100%;margin: 5px auto;">Login</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%;margin: 5px auto;">Войти</button>
     </form>
+    <a href="{% url 'password_reset' %}">Забыли пароль?</a>
 
 
 {% endblock %}

@@ -54,29 +54,21 @@
 						<div class="col-sm-12">
 							<div class="card">
 								<div class="card-body">
-                                    <h5 class="d-flex align-items-center mb-3">Posts</h5>
-                                    {% for post in profile_items %}
-
-                                        <div class="card mb-3 ">
+                                    <h5 class="d-flex align-items-center mb-3">Коментарии</h5>
+                                    {% for item in profile_items %}
+                                        <div class="card mb-3">
                                             <div class="card-header">
-                                                Категория: <a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a>
+                                                <h5 class="card-title" >
+                                                    <a href="{% url 'view_news' item.post.id %}">
+                                                    {{ item.post.title }}
+                                                    </a>
+                                                </h5>
                                             </div>
                                             <div class="card-body">
-                                                <div class="media">
-                                                    {% if post.photo %}
-                                                        <img src="{{ post.photo.url }}" alt="" width="350" class="mr-3">
-                                                    {% else %}
-                                                        <img src="https://i.picsum.photos/id/1060/536/354.jpg?blur=2&hmac=0zJLs1ar00sBbW5Ahd_4zA6pgZqCVavwuHToO6VtcYY" alt="" width="350">
-                                                    {% endif %}
-                                                    <div class="media-body">
-                                                        <h5 class="card-title">{{ post.title }}</h5>
-                                                        <p class="card-text">{{ post.content|safe|linebreaks|truncatewords:50 }}</p>
-                                                        <a href="/profile/update-news/{{ post.id }}" class="btn btn-primary">Редактировать</a> <a class="btn btn-danger position-absolute end-0" href="delete-news/{{ post.id }}/" >Удалить новость</a>
-                                                    </div>
-                                                </div>
+                                                <p class="card-text">{{ item.comment.text }}</p>
                                             </div>
-                                            <div class="card-footer text-muted">
-                                                {{ post.created_at|date:'Y-m-d H:i:s' }} | {{ post.author }} | Опубликован: {{ post.is_published }}
+                                            <div class="card-footer">
+                                                <p>Оценка: {{ item.rating_value }} из 5</p>
                                             </div>
                                         </div>
                                     {% endfor %}

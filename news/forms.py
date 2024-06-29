@@ -6,11 +6,29 @@ from django import forms
 
 from captcha.fields import CaptchaField, CaptchaTextInput
 
-from .models import News
+from .models import News, Comment, Rating
 
 from re import match
 
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 4}),  # Виджет для текстового поля
+        }
+
+
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['value']
+        widgets = {
+            'value': forms.Select(choices=[(i, i) for i in range(1, 6)]),
+        }
 
 
 class ContactForm(forms.Form):

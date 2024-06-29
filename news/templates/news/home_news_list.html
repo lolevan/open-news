@@ -8,11 +8,11 @@
     {% include 'inc/_sidebar.html' %}
 {% endblock %}
 {% block content %}
-    {{ mixin_prop }}
     {% for item in news %}
         <div class="card mb-3">
             <div class="card-header">
                 Категория: <a href="{{ item.category.get_absolute_url }}">{{ item.category }}</a>
+                <p>Средняя оценка: {{ item.average_rating }}</p>
             </div>
             <div class="card-body">
                 <div class="media">
@@ -24,7 +24,7 @@
                     <div class="media-body">
                         <h5 class="card-title">{{ item.title }}</h5>
                         <p class="card-text">{{ item.content|safe|linebreaks|truncatewords:50 }}</p>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Read more...</a>
+                        <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Читать дальше...</a>
                     </div>
                 </div>
             </div>

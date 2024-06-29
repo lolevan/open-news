@@ -86,11 +86,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'django',
-        # 'USER': 'root',
-        # 'PASSWORD': '',
-        # 'HOST': 'localhost',
     }
 }
 
@@ -146,13 +141,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = ['127.0.0.1']
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'EMAIL_HOST'
-EMAIL_PORT = 'EMAIL_PORT'
-EMAIL_HOST_USER = 'EMAIL_HOST_USER'
-EMAIL_HOST_PASSWORD = 'EMAIL_HOST_PASSWORD'
-EMAIL_USE_TLS = 'EMAIL_USE_TLS'
-EMAIL_USE_SSL = 'EMAIL_USE_SSL'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = 'podderjkabgu@mail.ru'
+EMAIL_HOST_PASSWORD = 'tJ645UqGQHSraamW8x6y'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+DEFAULT_FROM_EMAIL = 'ttestf96@mail.ru'
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 

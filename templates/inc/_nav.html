@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a style="padding-right: 100px; padding-left: 30px;" class="navbar-brand" href="{% url 'home' %}">Open-News</a>
+    <a style="padding-right: 100px; padding-left: 30px;" class="navbar-brand" href="{% url 'home' %}">Guidebook</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -9,7 +9,7 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Главная</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Обратная связь</a></li>
-            {% if request.user.is_authenticated %}
+            {% if request.user.is_authenticated and request.user.is_staff %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'add_news' %}">Добавить новость</a></li>
             {% endif %}
         </ul>
@@ -17,7 +17,7 @@
         {% if request.user.is_authenticated %}
             Добро пожаловать, <a href="{% url 'profile' %}">{{ user.username }}</a> | <a style="padding-right: 20px;" href="{% url 'logout' %}">Выход</a>
         {% else %}
-            <a href="{% url 'register' %}">Register</a> | <a style="padding-right: 20px;" href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Регистрация</a> | <a style="padding-right: 20px;" href="{% url 'login' %}">Вход</a>
         {% endif %}
         </span>
     </div>
